@@ -33,7 +33,6 @@
 
 <script>
 import { ContactCard, ContactList, ContactEdit ,popup} from 'vant';
-import axios from "axios"
 let OK = 200;
 export default {
   name: 'Contact',
@@ -90,15 +89,16 @@ export default {
       let body = ""
       if (this.isEdit) {
         // this.list = this.list.map(item => item.id === info.id ? info : item);
-        body = await axios({
-          url:"http://localhost:9000/api/contact/edit",
-          method:"put",
-          data:{
-            name:info.name,
-            tel:info.tel,
-            id:info.id
-          }
-        })
+        // body = await axios({
+        //   url:"http://localhost:9000/api/contact/edit",
+        //   method:"put",
+        //   data:{
+        //     name:info.name,
+        //     tel:info.tel,
+        //     id:info.id
+        //   }
+        // })
+        body = await this.$http.contact.updateContact({name:info.name,tel:info.tel,id:info.id})
       } else {
         // 第一种
         // body = await axios({
@@ -110,14 +110,15 @@ export default {
         //   }
         // })
         // 第二种
-        let formData = new FormData();
-        formData.append('name', info.name);
-        formData.append('tel', info.tel );
-        body = await axios({
-          url:"http://localhost:9000/api/contact/new/form",
-          method:"post",
-          data:formData
-        })
+        // let formData = new FormData();
+        // formData.append('name', info.name);
+        // formData.append('tel', info.tel );
+        // body = await axios({
+        //   url:"http://localhost:9000/api/contact/new/form",
+        //   method:"post",
+        //   data:formData
+        // })
+        body = await this.$http.contact.addContact({name:info.name,tel:info.tel})
       }
       await this.updateList()
       this.chosenContactId = body.data.data.id;
@@ -127,11 +128,12 @@ export default {
     async onDelete(info) {
       this.showEdit = false;
       // this.list = this.list.filter(item => item.id !== info.id);
-      let body = await axios({
-          url:"http://localhost:9000/api/contact",
-          method:"delete",
-          params:{"id":info.id}
-      })
+      // let body = await axios({
+      //     url:"http://localhost:9000/api/contact",
+      //     method:"delete",
+      //     params:{"id":info.id}
+      // })
+      let body = await this.$http.contact.deleteContact({id:info.id})
       if(body.data.code === OK){
           if (this.chosenContactId === info.id) {
           this.chosenContactId = null;
@@ -141,10 +143,7 @@ export default {
       
     },
     async updateList(){
-      const body = await axios({
-          url:"http://localhost:9000/api/contactList",
-          method:"get"
-      })
+      let body = await this.$http.contact.getContactList()
       if(body.data.code === OK)
           this.list = body.data.data
       }
